@@ -29,8 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 public class RateControllerTests {
 
-	@Autowired
-	private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
   @MockBean
   Cache mockCache;
@@ -38,57 +38,57 @@ public class RateControllerTests {
   @InjectMocks
   RateController controller;
 
-	@Test
-	public void noParamsCalculationShouldReturnOne() throws Exception {
+  @Test
+  public void noParamsCalculationShouldReturnOne() throws Exception {
     when(mockCache.getRates()).thenReturn(getRates());
-		this.mockMvc.perform(get("/rates")).andDo(print()).andExpect(status().isOk())
-			.andExpect(jsonPath("$.result").value("1.0"));
-	}
+    this.mockMvc.perform(get("/rates")).andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.result").value("1.0"));
+  }
 
-	@Test
-	public void fromParamShouldReturnCorrectSum() throws Exception {
-		when(mockCache.getRates()).thenReturn(getRates());		
-		this.mockMvc.perform(get("/rates").param("from", "USD"))
-		  .andDo(print()).andExpect(status().isOk())
-		  .andExpect(jsonPath("$.result").value("0.9323504721265975"));
-	}
-	
-	@Test
-	public void toParamShouldReturnCorrectSum() throws Exception {
-		when(mockCache.getRates()).thenReturn(getRates());		
-		this.mockMvc.perform(get("/rates").param("to", "USD"))
-		  .andDo(print()).andExpect(status().isOk())
-		  .andExpect(jsonPath("$.result").value("1.072558045387268"));
-	}
+  @Test
+  public void fromParamShouldReturnCorrectSum() throws Exception {
+    when(mockCache.getRates()).thenReturn(getRates());		
+    this.mockMvc.perform(get("/rates").param("from", "USD"))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.result").value("0.9323504721265975"));
+  }
+  
+  @Test
+  public void toParamShouldReturnCorrectSum() throws Exception {
+    when(mockCache.getRates()).thenReturn(getRates());		
+    this.mockMvc.perform(get("/rates").param("to", "USD"))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.result").value("1.072558045387268"));
+  }
 
-	@Test
-	public void amountParamShouldReturnCorrectSum() throws Exception {
-		when(mockCache.getRates()).thenReturn(getRates());		
-		this.mockMvc.perform(get("/rates").param("amount", "50"))
-		  .andDo(print()).andExpect(status().isOk())
-		  .andExpect(jsonPath("$.result").value("50.0"));
+  @Test
+  public void amountParamShouldReturnCorrectSum() throws Exception {
+    when(mockCache.getRates()).thenReturn(getRates());		
+    this.mockMvc.perform(get("/rates").param("amount", "50"))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.result").value("50.0"));
 }
 
-	@Test
-	public void incorrectCurrencyShouldProduceError() throws Exception {
-		when(mockCache.getRates()).thenReturn(getRates());		
-		this.mockMvc.perform(get("/rates").param("from", "USDP"))
-			.andDo(print()).andExpect(status().isNotFound())
-			.andExpect(content().string("Incorrect fromRate"));
-	}
+  @Test
+  public void incorrectCurrencyShouldProduceError() throws Exception {
+    when(mockCache.getRates()).thenReturn(getRates());		
+    this.mockMvc.perform(get("/rates").param("from", "USDP"))
+      .andDo(print()).andExpect(status().isNotFound())
+      .andExpect(content().string("Incorrect fromRate"));
+  }
 
-	@Test
-	public void incorrectAmountShouldProduceError() throws Exception {
-		when(mockCache.getRates()).thenReturn(getRates());		
-		this.mockMvc.perform(get("/rates").param("amount", "USDP"))
-			.andDo(print()).andExpect(status().isNotFound())
-			.andExpect(content().string("Failed to convert value of type 'java.lang.String' to required type 'double'; For input string: \"USDP\""));
-	}
+  @Test
+  public void incorrectAmountShouldProduceError() throws Exception {
+    when(mockCache.getRates()).thenReturn(getRates());		
+    this.mockMvc.perform(get("/rates").param("amount", "USDP"))
+      .andDo(print()).andExpect(status().isNotFound())
+      .andExpect(content().string("Failed to convert value of type 'java.lang.String' to required type 'double'; For input string: \"USDP\""));
+  }
 
-	private Rates getRates() throws Exception {
-		Resource stateFile = new ClassPathResource("rates.json");
-		ObjectMapper mapper = new ObjectMapper();
-		Rates rates = mapper.readValue(stateFile.getFile(), Rates.class);
-		return rates;
-	}
+  private Rates getRates() throws Exception {
+    Resource stateFile = new ClassPathResource("rates.json");
+    ObjectMapper mapper = new ObjectMapper();
+    Rates rates = mapper.readValue(stateFile.getFile(), Rates.class);
+    return rates;
+  }
 }

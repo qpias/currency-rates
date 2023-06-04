@@ -19,33 +19,32 @@ import org.springframework.http.ResponseEntity;
 @RestController
 public class RateController {
 
-	@Autowired
-	Cache cache;
+  @Autowired
+  Cache cache;
 
-	@GetMapping("/rates")
-	public Map<String, Double> greeting(
-		  @RequestParam(value = "from", defaultValue = "EUR") String from,
-		  @RequestParam(value = "to", defaultValue = "EUR") String to,
-		  @RequestParam(value = "amount", defaultValue = "1") double amount,
-		  HttpServletResponse response
-		) throws Exception {
-		System.out.println(from + " " + to + " " + amount);
-		long startTime = System.nanoTime();
-		Rates rates = cache.getRates();
-		Float fromRate = rates.getRate(from);
-		if (isNull(fromRate)) throw new Exception("Incorrect fromRate");
-		Float toRate = rates.getRate(to);
-		if (isNull(toRate)) throw new Exception("Incorrect toRate");
-		double result = Calculator.calculate(fromRate, toRate, amount);
-		long endTime = System.nanoTime();
+  @GetMapping("/rates")
+  public Map<String, Double> greeting(
+      @RequestParam(value = "from", defaultValue = "EUR") String from,
+      @RequestParam(value = "to", defaultValue = "EUR") String to,
+      @RequestParam(value = "amount", defaultValue = "1") double amount,
+      HttpServletResponse response
+    ) throws Exception {
+    long startTime = System.nanoTime();
+    Rates rates = cache.getRates();
+    Float fromRate = rates.getRate(from);
+    if (isNull(fromRate)) throw new Exception("Incorrect fromRate");
+    Float toRate = rates.getRate(to);
+    if (isNull(toRate)) throw new Exception("Incorrect toRate");
+    double result = Calculator.calculate(fromRate, toRate, amount);
+    long endTime = System.nanoTime();
     long relapsedTime = endTime - startTime;
-		Map<String, Double> resultMap = new HashMap<String, Double>();
-		resultMap.put("result", result);
-		response.setHeader("Server-Timing", "calc;desc=\"Calculation\";dur=" + relapsedTime);
-		return resultMap;
-	}
+    Map<String, Double> resultMap = new HashMap<String, Double>();
+    resultMap.put("result", result);
+    response.setHeader("Server-Timing", "calc;desc=\"Calculation\";dur=" + relapsedTime);
+    return resultMap;
+  }
 
-	@ExceptionHandler(Exception.class)
+  @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseEntity<String> handleException(
       Exception exception
