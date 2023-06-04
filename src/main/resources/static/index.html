@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>Rates</title>
+    <script src="jquery.min.js"></script>
+  </head>
+  <body>
+    <p>Insert values and go!</p>
+    <form>
+      <label for="from">From currency:</label><br>
+      <input type="text" id="from" name="from" value="EUR"><br>
+      <label for="to">To currency:</label><br>
+      <input type="text" id="to" name="to" value="EUR"><br>
+      <label for="amount">Amount:</label><br>
+      <input type="text" id="amount" name="amount" value="1"><br>
+      <input type="submit">
+    </form>
+    <h3>Result:</h3>
+    <p id="result"></p>
+    <script>
+      $(document).ready(function () {
+
+        const usrlang = navigator.language 
+            || navigator.userLanguage
+
+        const initialFormattedNumber = new Intl.NumberFormat(usrlang, { style: 'currency', currency: $("#to").val() }).format($("#amount").val())
+        $("#result").text(initialFormattedNumber)
+
+        $("form").submit(function (event) {
+          const formData = {
+            from: $("#from").val(),
+            to: $("#to").val(),
+            amount: $("#amount").val(),
+          };
+          $.get(`rates?from=${formData.from}&to=${formData.to}&amount=${formData.amount}`)
+          .done(function(data){ 
+            const number = data.result
+            const formattedNumber = new Intl.NumberFormat(usrlang, { style: 'currency', currency: formData.to }).format(number)
+            $("#result").text(formattedNumber)
+          })
+          .fail(function(xhr){
+            alert(xhr.responseText)
+          });
+          event.preventDefault()
+        });
+      });
+    </script>
+  </body>
+</html>
